@@ -35,7 +35,7 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
     // - The Nonce returned in this function will expire after 10 minutes, after which you will need
     //   to call
     public void onAuthenticationChallenge(final LayerClient client, final String nonce) {
-        final String mUserId = MainActivity.getUserID();
+        final String mUserId = main_activity.getUserID();
 
         //Note: This Layer Authentication Service is for TESTING PURPOSES ONLY
         //When going into production, you will need to create your own web service
@@ -44,8 +44,7 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    HttpPost post = new HttpPost("https://layer-identity-provider.herokuapp" +
-                            ".com/identity_tokens");
+                    HttpPost post = new HttpPost("http://192.168.1.10:8080/identity-token");
                     post.setHeader("Content-Type", "application/json");
                     post.setHeader("Accept", "application/json");
 
@@ -89,5 +88,6 @@ public class MyAuthenticationListener implements LayerAuthenticationListener {
     //Called after the user has been deauthenticated
     public void onDeauthenticated(LayerClient client) {
         Log.v(TAG, "User is deauthenticated.");
+        main_activity.setContentView(R.layout.activity_loading);
     }
 }

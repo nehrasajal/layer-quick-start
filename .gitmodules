@@ -1,0 +1,6 @@
+[submodule "Atlas-Android"]
+	path = Atlas-Android
+	url = git@github.com:layerhq/Atlas-Android
+[submodule "Atlas-Android-Messenger"]
+	path = Atlas-Android-Messenger
+	url = git@github.com:layerhq/Atlas-Android-Messenger

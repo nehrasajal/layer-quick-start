@@ -15,8 +15,9 @@ import java.util.List;
 /**
  * Takes a Layer Message object, formats the text and attaches it to a LinearLayout
  */
-public class MessageView {
+public class    MessageView {
 
+    private final String userId;
     //The parent object (in this case, a LinearLayout object with a ScrollView parent)
     private LinearLayout myParent;
 
@@ -29,9 +30,9 @@ public class MessageView {
     private LinearLayout messageDetails;
 
     //Takes the Layout parent object and message
-    public MessageView(LinearLayout parent, Message msg) {
+    public MessageView(LinearLayout parent, Message msg, String userId) {
         myParent = parent;
-
+       this.userId=userId;
         //The first part of each message will include the sender and status
         messageDetails = new LinearLayout(parent.getContext());
         messageDetails.setOrientation(LinearLayout.HORIZONTAL);
@@ -96,7 +97,7 @@ public class MessageView {
             return Message.RecipientStatus.PENDING;
 
         //If we didn't send the message, we already know the status - we have read it
-        if (!msg.getSender().getUserId().equalsIgnoreCase(MainActivity.getUserID()))
+        if (!msg.getSender().getUserId().equalsIgnoreCase(userId))
             return Message.RecipientStatus.READ;
 
         //Assume the message has been sent
@@ -109,7 +110,7 @@ public class MessageView {
 
             //Don't check the status of the current user
             String participant = MainActivity.getAllParticipants().get(i);
-            if (participant.equalsIgnoreCase(MainActivity.getUserID()))
+            if (participant.equalsIgnoreCase(userId))
                 continue;
 
             if (status == Message.RecipientStatus.SENT) {

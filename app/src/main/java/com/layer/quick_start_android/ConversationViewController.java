@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -39,7 +40,7 @@ import java.util.Random;
  * messages in the GUI.
  */
 public class ConversationViewController implements View.OnClickListener, LayerChangeEventListener
-        .MainThread, TextWatcher, LayerTypingIndicatorListener, LayerSyncListener {
+        , TextWatcher, LayerTypingIndicatorListener, LayerSyncListener {
 
     private static final String TAG = ConversationViewController.class.getSimpleName();
 
@@ -47,11 +48,12 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
     //GUI elements
     private Button sendButton;
-    private LinearLayout topBar;
+    private RelativeLayout topBar;
     private EditText userInput;
     private ScrollView conversationScroll;
     private LinearLayout conversationView;
     private TextView typingIndicator;
+    private MainActivity mainActivity;
 
     //List of all users currently typing
     private ArrayList<String> typingUsers;
@@ -66,7 +68,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         //Cache off LayerClient
         layerClient = client;
-
+        mainActivity = ma;
         //When conversations/messages change, capture them
         layerClient.registerEventListener(this);
 
@@ -78,7 +80,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         //Cache off gui objects
         sendButton = (Button) ma.findViewById(R.id.send);
-        topBar = (LinearLayout) ma.findViewById(R.id.topbar);
+        topBar = (RelativeLayout) ma.findViewById(R.id.topbar);
         userInput = (EditText) ma.findViewById(R.id.input);
         conversationScroll = (ScrollView) ma.findViewById(R.id.scrollView);
         conversationView = (LinearLayout) ma.findViewById(R.id.conversation);
@@ -101,8 +103,8 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
             getTopBarMetaData();
     }
 
-    public static String getInitialMessage() {
-        return "Hey, everyone! This is your friend, " + MainActivity.getUserID();
+    public String getInitialMessage() {
+        return "Hey, everyone! This is your friend, " + mainActivity.getUserID();
     }
 
     //Create a new message and send it
@@ -131,7 +133,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
 
         //Formats the push notification that the other participants will receive
         MessageOptions options = new MessageOptions();
-        options.pushNotificationMessage(MainActivity.getUserID() + ": " + text);
+        options.pushNotificationMessage(mainActivity.getUserID() + ": " + text);
 
         //Creates and returns a new message object with the given conversation and array of
         // message parts
@@ -175,7 +177,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         return activeConversation;
     }
 
-    //Redraws the conversation window in the GUI
+    //Redraws the conversation window in the GUI`
     private void drawConversation() {
 
         //Only proceed if there is a valid conversation
@@ -205,12 +207,12 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     private void addMessageToView(Message msg) {
 
         //Make sure the message is valid
-        if (msg == null || msg.getSender() == null || msg.getSender().getUserId() == null)
+        if (msg == null || msg.getSender() == null)
             return;
 
         //Once the message has been displayed, we mark it as read
         //NOTE: the sender of a message CANNOT mark their own message as read
-        if (!msg.getSender().getUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
+        if (msg.getSender().getUserId() != null && !msg.getSender().getUserId().equalsIgnoreCase(layerClient.getAuthenticatedUserId()))
             msg.markAsRead();
 
         //Grab the message id
@@ -219,7 +221,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
         //If we have already added this message to the GUI, skip it
         if (!allMessages.contains(msgId)) {
             //Build the GUI element and save it
-            MessageView msgView = new MessageView(conversationView, msg);
+            MessageView msgView = new MessageView(conversationView, msg, mainActivity.getUserID());
             allMessages.put(msgId, msgView);
         }
     }
@@ -295,7 +297,7 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     // LayerChangeEventListener methods
     //================================================================================
 
-    public void onEventMainThread(LayerChangeEvent event) {
+    public void onChangeEvent(LayerChangeEvent event) {
 
         //You can choose to handle changes to conversations or messages however you'd like:
         List<LayerChange> changes = event.getChanges();
@@ -433,6 +435,21 @@ public class ConversationViewController implements View.OnClickListener, LayerCh
     //Called after syncing with the Layer servers
     public void onAfterSync(LayerClient layerClient) {
         Log.v(TAG, "Sync complete");
+    }
+
+    @Override
+    public void onBeforeSync(LayerClient layerClient, SyncType syncType) {
+
+    }
+
+    @Override
+    public void onSyncProgress(LayerClient layerClient, SyncType syncType, int i) {
+
+    }
+
+    @Override
+    public void onAfterSync(LayerClient layerClient, SyncType syncType) {
+
     }
 
     //Captures any errors with syncing

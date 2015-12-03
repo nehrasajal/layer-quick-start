@@ -23,9 +23,10 @@
 package com.layer.quick_start_android;
 
 import android.app.AlertDialog;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.EditText;
 
 import com.layer.sdk.LayerClient;
 
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Replace this with your App ID from the Layer Developer page.
     //Go http://developer.layer.com, click on "Dashboard" and select "Keys"
-    public static final String LAYER_APP_ID = "LAYER_APP_ID";
+    public static final String LAYER_APP_ID = "layer:///apps/staging/74f4d0fe-8cf8-11e5-9a5d-afaa43003a92";
 
     //Optional: Enable Push Notifications
     // Layer uses Google Cloud Messaging for Push Notifications. Go to
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     // an invalid Project Number is used here, the Layer SDK will function, but
     // users will not receive Notifications when the app is closed or in the
     // background).
-    public static final String GCM_PROJECT_NUMBER = "00000";
+    public static final String GCM_PROJECT_NUMBER = "651133573884";
 
 
     //Global variables used to manage the Layer Client and the conversations in this app
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     //Layer connection and authentication callback listeners
     private MyConnectionListener connectionListener;
     private MyAuthenticationListener authenticationListener;
+    private EditText userName;
 
     //onCreate is called on App Start
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         //Connect to Layer and Authenticate a user
-        loadLayerClient();
+//        loadLayerClient();
 
         //Every time the app is brought to the foreground, register the typing indicator
         if(layerClient != null && conversationView != null)
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             if(layerClient == null){
 
                 //Used for debugging purposes ONLY. DO NOT include this option in Production Builds.
-                LayerClient.enableLogging(this.getApplicationContext());
+                LayerClient.setLoggingEnabled(this.getApplicationContext(),true);
 
                 // Initializes a LayerClient object with the Google Project Number
                 LayerClient.Options options = new LayerClient.Options();
@@ -178,28 +180,35 @@ public class MainActivity extends AppCompatActivity {
     // create a new one, as long as all user ids are unique. For demonstration purposes, we are
     // making the assumption that this App will be run simultaneously on a Simulator and on a
     // Device, and assign the User ID based on the runtime environment.
-    public static String getUserID(){
-        if(Build.FINGERPRINT.startsWith("generic"))
-            return "Simulator";
-
-        return "Device";
+    public String getUserID() {
+//        if(Build.FINGERPRINT.startsWith("generic"))
+//            return "Simulator";
+//
+//        return "shivansh";
+        return userName.getText().toString();
     }
 
     //By default, create a conversationView between these 3 participants
     public static List<String> getAllParticipants(){
-        return Arrays.asList("Device", "Simulator", "Dashboard");
+        return Arrays.asList("shivansh", "rahul");
     }
 
     //Once the user has successfully authenticated, begin the conversationView
     public void onUserAuthenticated(){
-
-        if(conversationView == null) {
 
             conversationView = new ConversationViewController(this, layerClient);
 
             if (layerClient != null) {
                 layerClient.registerTypingIndicator(conversationView);
             }
-        }
+    }
+
+    public void doLogin(View view) {
+        userName = (EditText) findViewById(R.id.user_name);
+        loadLayerClient();
+    }
+
+    public void doLogout(View view) {
+        layerClient.deauthenticate();
     }
 }
