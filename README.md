@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Layer QuickStart for Android
 
 **Example code for integrating [LayerKit](https://layer.com/).**
@@ -36,3 +37,6 @@ QuickStart was crafted in San Francisco by Neil Mehta during his work on [Layer]
 ## License
 
 QuickStart is available under the Apache 2 License. See the LICENSE file for more info.
+=======
+# layer-quick-start
+>>>>>>> origin/master
